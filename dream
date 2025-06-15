@@ -1,0 +1,49 @@
+def rotate_dealer(dealer_index, num_players):
+    return (dealer_index + 1) % num_players
+
+def input_participants():
+    names = input("Enter participant names separated by commas: ").split(",")
+    return [name.strip() for name in names]
+
+def input_round_results(participants):
+    results = []
+    print("\nEnter the net result for each participant (gain: +ve, loss: -ve):")
+    for name in participants:
+        while True:
+            try:
+                value = float(input(f"{name}: "))
+                results.append(value)
+                break
+            except ValueError:
+                print("Invalid input. Enter a number.")
+    if abs(sum(results)) > 0.01:
+        print("Warning: Total net result is not zero. Please check the inputs.")
+    return results
+
+def print_summary(participants, total_balances):
+    print("\n=== Final Summary ===")
+    for name, balance in zip(participants, total_balances):
+        status = "gained" if balance >= 0 else "lost"
+        print(f"{name} {status} {abs(balance):.2f} units.")
+
+def poker_game():
+    participants = input_participants()
+    num_players = len(participants)
+    total_balances = [0.0] * num_players
+    dealer_index = 0
+
+    while True:
+        print(f"\nCurrent dealer: {participants[dealer_index]}")
+        results = input_round_results(participants)
+        total_balances = [total + round_result for total, round_result in zip(total_balances, results)]
+
+        cont = input("Do you want to play another round? (y/n): ").lower()
+        if cont != 'y':
+            break
+        dealer_index = rotate_dealer(dealer_index, num_players)
+
+    print_summary(participants, total_balances)
+
+# Run the game
+if __name__ == "__main__":
+    poker_game()
